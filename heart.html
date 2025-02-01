@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Heart Animation</title>
+    <style>
+        body {
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+        }
+        canvas {
+            position: absolute;
+        }
+        #princessText {
+            position: absolute;
+            font-size: 24px;
+            color: pink;
+            font-family: Arial, sans-serif;
+            text-shadow: 2px 2px 10px pink;
+            opacity: 0;
+            transform: scale(0.5);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="heartCanvas"></canvas>
+    <div id='princessText'>You are my princess 👑</div>
+    <script>
+        const canvas = document.getElementById("heartCanvas");
+        const ctx = canvas.getContext("2d");
+        const text = document.getElementById("princessText");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        function heartShape(t) {
+            const x = 16 * Math.pow(Math.sin(t), 3);
+            const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+            return { x: x * 15 + canvas.width / 2, y: -y * 15 + canvas.height / 2 };
+        }
+
+        let points = [];
+        for (let t = 0; t <= Math.PI * 2; t += 0.05) {
+            points.push(heartShape(t));
+        }
+
+        let frame = 0;
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = "pink";
+            ctx.lineWidth = 3;
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = "pink";
+            ctx.beginPath();
+            for (let i = 0; i < frame; i++) {
+                ctx.lineTo(points[i].x, points[i].y);
+            }
+            ctx.stroke();
+
+            if (frame < points.length) {
+                frame++;
+                requestAnimationFrame(animate);
+            } else {
+                animateText();
+            }
+        }
+
+        function animateText() {
+            let opacity = 0;
+            let scale = 0.5;
+            text.style.left = `${canvas.width / 2 - 70}px`;
+            text.style.top = `${canvas.height / 2 - 20}px`;
+            let interval = setInterval(() => {
+                opacity += 0.02;
+                scale += 0.02;
+                text.style.opacity = opacity;
+                text.style.transform = `scale(${scale})`;
+                if (opacity >= 1) clearInterval(interval);
+            }, 50);
+        }
+
+        setTimeout(() => {
+            frame = 0;
+            animate();
+        }, 500);
+    </script>
+</body>
+</html>
